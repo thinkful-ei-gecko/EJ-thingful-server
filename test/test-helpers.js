@@ -169,7 +169,7 @@ function calculateAverageReviewRating(reviews) {
   const sum = reviews
     .map(review => review.rating)
     .reduce((a, b) => 
-     b)
+    a + b)
 
   return Math.round(sum / reviews.length)
 }
@@ -260,6 +260,12 @@ function seedThingsTables(db, users, things, reviews=[]) {
   return db.transaction(async trx => {
     await seedUsers(trx, users)
     await trx.into('thingful_things').insert(things)
+
+    // update the auto sequence to match the forced id values
+    await trx.raw(
+      `SELECT setval('thingful_things_id_seq', ?)`,
+      [things[things.length - 1].id],)
+      
     if (reviews.length) {
       await trx.into('thingful_reviews').insert(reviews);
       await trx.raw(
@@ -267,10 +273,6 @@ function seedThingsTables(db, users, things, reviews=[]) {
         [reviews[reviews.length - 1].id],
       );
     }
-    // update the auto sequence to match the forced id values
-    await trx.raw(
-      `SELECT setval('thingful_things_id_seq', ?)`,
-      [things[things.length - 1].id],)
   })
 }
 
