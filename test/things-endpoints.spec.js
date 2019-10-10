@@ -44,7 +44,7 @@ describe('Things Endpoints', function() {
         )
       )
 
-      it('responds with 200 and all of the things', () => {
+      it.only('responds with 200 and all of the things', () => {
         const expectedThings = testThings.map(thing =>
           helpers.makeExpectedThing(
             testUsers,
@@ -87,7 +87,7 @@ describe('Things Endpoints', function() {
 
   describe(`GET /api/things/:thing_id`, () => {
     context(`Given no things`, () => {
-      beforeEach(() => db.into('thingful_users').insert(testUsers))
+      beforeEach(() => helpers.seedUsers(db, testUsers))
       it(`responds with 404`, () => {
         const thingId = 123456
         return supertest(app)
@@ -194,7 +194,7 @@ describe('Things Endpoints', function() {
 
   describe(`GET /api/things/:thing_id/reviews`, () => {
     context(`Given no things`, () => {
-      beforeEach(() => db.into('thingful_users').insert(testUsers))
+      beforeEach(() => helpers.seedUsers(db, testUsers))
       it(`responds with 404`, () => {
         const thingId = 123456
         return supertest(app)
