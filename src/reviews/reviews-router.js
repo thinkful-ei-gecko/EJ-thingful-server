@@ -1,15 +1,16 @@
+  
 const express = require('express')
 const path = require('path')
-const ReviewsService = require('./reviews-service')
-const {requireAuth} = require('../middleware/jwt-auth')
+const ReviewsService = require('./Reviews-service')
+const { requireAuth } = require('../middleware/jwt-auth')
 
-const reviewsRouter = express.Router()
+const ReviewsRouter = express.Router()
 const jsonBodyParser = express.json()
 
-reviewsRouter
+ReviewsRouter
   .route('/')
   .post(requireAuth, jsonBodyParser, (req, res, next) => {
-    const { thing_id, rating, text} = req.body
+    const { thing_id, rating, text } = req.body
     const newReview = { thing_id, rating, text }
 
     for (const [key, value] of Object.entries(newReview))
@@ -17,20 +18,20 @@ reviewsRouter
         return res.status(400).json({
           error: `Missing '${key}' in request body`
         })
-    
-        newReview.user_id = req.user.id
+
+    newReview.user_id = req.user.id
 
     ReviewsService.insertReview(
       req.app.get('db'),
       newReview
     )
-      .then(review => {
+      .then(Review => {
         res
           .status(201)
-          .location(path.posix.join(req.originalUrl, `/${review.id}`))
-          .json(ReviewsService.serializeReview(review))
+          .location(path.posix.join(req.originalUrl, `/${Review.id}`))
+          .json(ReviewsService.serializeReview(Review))
       })
       .catch(next)
     })
 
-module.exports = reviewsRouter
+module.exports = ReviewsRouter
